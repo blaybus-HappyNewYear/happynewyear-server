@@ -1,11 +1,15 @@
 package blaybus.happynewyear.member.service.Impl;
 
+import blaybus.happynewyear.config.error.ErrorCode;
+import blaybus.happynewyear.config.error.exception.BusinessException;
 import blaybus.happynewyear.member.dto.JwtToken;
+import blaybus.happynewyear.member.dto.MemberInfoDto;
 import blaybus.happynewyear.member.dto.SignUpDto;
 import blaybus.happynewyear.member.entity.Member;
 import blaybus.happynewyear.member.jwt.JwtTokenProvider;
 import blaybus.happynewyear.member.repository.MemberRepository;
 import blaybus.happynewyear.member.service.MemberService;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -60,5 +64,15 @@ public class MemberServiceImpl implements MemberService {
         if(findMembers.isPresent()) {
             throw new IllegalStateException("이미 사용 중인 사용자 이름입니다.");
         }
+    }
+
+    @Override
+    @Transactional
+    public MemberInfoDto getMemberInfo(String accessToken) {
+        Claims claims = jwtTokenProvider.parseClaims(accessToken);
+        String username = claims.getSubject();
+        Member member = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        return MemberInfoDto.toDto(member);
     }
 }
