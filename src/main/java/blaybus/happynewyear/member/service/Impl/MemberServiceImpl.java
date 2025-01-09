@@ -10,8 +10,10 @@ import blaybus.happynewyear.member.entity.Member;
 import blaybus.happynewyear.member.jwt.JwtTokenProvider;
 import blaybus.happynewyear.member.repository.MemberRepository;
 import blaybus.happynewyear.member.service.MemberService;
+import blaybus.happynewyear.redis.RedisService;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -19,18 +21,21 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MemberServiceImpl implements MemberService {
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RedisService redisService;
 
     @Override
     @Transactional
@@ -44,7 +49,13 @@ public class MemberServiceImpl implements MemberService {
         // authenticate 메서드가 실행될 때 CustomUserDetailService에서 만든 loadUserByUsername 메서드 실행
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
+        // 3. 인증 정보를 기반으로 jwt token 생성
         JwtToken jwtToken = jwtTokenProvider.generateToken(authentication);
+
+        // 4. redis에 refresh token 저장
+        long refreshTokenExpirationMillis = jwtTokenProvider.getRefreshTokenExpirationMillis();
+        redisService.setValues(authentication.getName(), jwtToken.getRefreshToken(), Duration.ofMillis(refreshTokenExpirationMillis));
+        log.info("username? : {}", authentication.getName());
 
         return jwtToken;
     }
@@ -52,7 +63,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional
     public void signUp(SignUpDto signUpDto) {
-        validateDuplicateMember(signUpDto.getUsername());
+        validateDuplicateMember(signUpDto.getId(), signUpDto.getUsername());
         //password 암호화
         String encodedPassword = passwordEncoder.encode(signUpDto.getPassword());
         List<String> roles = new ArrayList<>();
@@ -60,10 +71,33 @@ public class MemberServiceImpl implements MemberService {
         memberRepository.save(signUpDto.toEntity(encodedPassword, roles));
     }
 
-    public void validateDuplicateMember(String username) {
+    public void validateDuplicateMember(Long id, String username) {
+
+        // id 중복 검증
+        Optional<Member> findById = memberRepository.findById(id);
+        if (findById.isPresent()) {
+            throw new BusinessException(ErrorCode.DUPLICATED_ID);
+        }
+
+        // username 중복 검증
         Optional<Member> findMembers = memberRepository.findByUsername(username);
         if(findMembers.isPresent()) {
             throw new BusinessException(ErrorCode.DUPLICATED_USERNAME);
+        }
+    }
+
+    @Override
+    public void signOut(String accessToken) {
+        Claims claims = jwtTokenProvider.parseClaims(accessToken);
+        String username = claims.getSubject();
+
+        if (!redisService.getValues(username).equals("false")) {
+            redisService.deleteValues(username);
+
+            // 로그아웃시 Access Token 블랙리스트에 저장
+            long accessTokenExpirationMillis = jwtTokenProvider.getAccessTokenExpirationMillis();
+            redisService.setValues(accessToken, "logout", Duration.ofMillis(accessTokenExpirationMillis));
+            log.info("logout success");
         }
     }
 
