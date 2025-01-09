@@ -31,6 +31,14 @@ public class MemberController {
         return ResponseEntity.ok("가입이 완료되었습니다.");
     }
 
+    @PostMapping("/sign-out")
+    public ResponseEntity<String > signOut(HttpServletRequest request) {
+        String accessToken = jwtTokenProvider.resloveAccessToken(request);
+        memberService.signOut(accessToken);
+
+        return ResponseEntity.ok("signed out successfully.");
+    }
+
     @GetMapping("/mypage")
     public ResponseEntity<MemberInfoDto> getMemberInfo(HttpServletRequest request) {
         String accessToken = jwtTokenProvider.resloveAccessToken(request);
@@ -51,4 +59,9 @@ public class MemberController {
         memberService.updateCharacter(accessToken, imgNumber);
         return ResponseEntity.ok("캐릭터가 성공적으로 변경되었습니다");
     }
+
+    @GetMapping("/jwt-test")
+    public String test() {
+        return "success!";}
+
 }

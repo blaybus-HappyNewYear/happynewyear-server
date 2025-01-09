@@ -9,8 +9,8 @@ public interface MemberService {
 
     JwtToken signIn(String memberId, String password);
     void signUp(SignUpDto signUpDto);
+    void signOut(String accessToken);
     MemberInfoDto getMemberInfo(String accessToken);
     void updatePassword(String accessToken, PasswordUpdateDto passwordUpdateDto);
-
     void updateCharacter(String accessToken, int imgNumber);
 }
