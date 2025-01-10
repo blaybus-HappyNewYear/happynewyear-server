@@ -17,7 +17,7 @@ public enum ErrorCode {
     QUEST_NOT_FOUND(HttpStatus.NOT_FOUND, "E404003", "존재하지 않는 퀘스트입니다."),
     TEAM_NOT_FOUND(HttpStatus.NOT_FOUND, "E404004", "존재하지 않는 소속입니다."),
 
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"E500001","서버 처리 중 오류가 발생했습니다. 관리자에게 문의하세요.");
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"E500001","서버 처리 중 오류가 발생했습니다. 관리자에게 문의하세요."),
     NO_NOTIFICATION(HttpStatus.NOT_FOUND,"E404005","사용자 알림이 존재하지 않습니다."),
     NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND,"E404006","요청한 알림이 존재하지 않습니다."),
     INVALID_READ_STATE(HttpStatus.BAD_REQUEST, "E400001","이미 읽은 알람입니다.");
