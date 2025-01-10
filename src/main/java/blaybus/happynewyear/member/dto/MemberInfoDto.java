@@ -23,7 +23,7 @@ public class MemberInfoDto {
                 .level(member.getLevel())
                 .imgNumber(member.getImgNumber())
                 .startDate(member.getStartDate())
-                .team(member.getTeam())
+                .team(member.getTeam().getTeamName())
                 .build();
     }
 }
