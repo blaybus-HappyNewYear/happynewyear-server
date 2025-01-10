@@ -2,6 +2,7 @@ package blaybus.happynewyear.post.service.impl;
 
 import blaybus.happynewyear.config.error.ErrorCode;
 import blaybus.happynewyear.config.error.exception.BusinessException;
+import blaybus.happynewyear.notification.service.NotificationService;
 import blaybus.happynewyear.post.dto.CreatePostDto;
 import blaybus.happynewyear.post.dto.PostPreviewDto;
 import blaybus.happynewyear.post.dto.ReadPostDto;
@@ -23,6 +24,7 @@ import java.time.LocalDate;
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
+    private final NotificationService notificationService;
 
     @Override
     @Transactional
@@ -30,6 +32,9 @@ public class PostServiceImpl implements PostService {
         LocalDate now = LocalDate.now();
         Post entity = createPostDto.toEntity(now);
         postRepository.save(entity);
+
+        //글 생성 시, 알림 생성
+        notificationService.createPostNotification(createPostDto.getTitle());
     }
 
     @Override
