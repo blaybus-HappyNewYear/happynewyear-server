@@ -21,21 +21,9 @@ public class NotificationController {
         List<NotificationDto> notifications = notificationService.getNotifications(request);
         return ResponseEntity.ok(notifications);
     }
-/*
-    @GetMapping("/notification")
-    public ResponseEntity<List<NotificationDto>> getNotifications(
-            @RequestHeader("Authorization") String accessToken) {
 
-        List<NotificationDto> notifications = notificationService.getNotifications(accessToken);
-
-        return ResponseEntity.ok(notifications);
-    }
-
-
- */
     @PatchMapping("notification/{id}")
     public ResponseEntity<String> updateRead(
-            @RequestHeader("Authorization") String accessToken,
             @PathVariable Long id,
             @RequestBody NotificationReadDto notificationReadDto) {
 

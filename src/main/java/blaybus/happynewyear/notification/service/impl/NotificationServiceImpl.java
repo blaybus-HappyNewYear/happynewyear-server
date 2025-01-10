@@ -2,7 +2,9 @@ package blaybus.happynewyear.notification.service.impl;
 
 import blaybus.happynewyear.config.error.ErrorCode;
 import blaybus.happynewyear.config.error.exception.BusinessException;
+import blaybus.happynewyear.member.entity.Member;
 import blaybus.happynewyear.member.jwt.JwtTokenProvider;
+import blaybus.happynewyear.member.repository.MemberRepository;
 import blaybus.happynewyear.notification.dto.NotificationDto;
 import blaybus.happynewyear.notification.entity.Notification;
 import blaybus.happynewyear.notification.entity.NotificationType;
@@ -13,6 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.webauthn.management.UserCredentialRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,31 +30,8 @@ public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final JwtTokenProvider jwtTokenProvider;
-/*
-    @Override
-    @Transactional(readOnly = true)
-    public List<NotificationDto> getNotifications(String accessToken) {
-        Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String username = userDetails.getUsername();
+    private final MemberRepository memberRepository;
 
-        List<Notification> notifications = notificationRepository.findByUsername(username);
-        if (notifications.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        return notifications.stream()
-                .map(notification -> NotificationDto.builder()
-                        .id(notification.getId())
-                        .type(notification.getType().name())
-                        .content(notification.getContent())
-                        .isRead(notification.isRead())
-                        .timestamp(notification.getTimestamp())
-                        .build())
-                .collect(Collectors.toList());
-    }
-
- */
 public List<NotificationDto> getNotifications(HttpServletRequest request) {
     // 1. Access Token 추출
     String accessToken = jwtTokenProvider.resloveAccessToken(request);
@@ -83,18 +63,24 @@ public List<NotificationDto> getNotifications(HttpServletRequest request) {
             .collect(Collectors.toList());
 }
 
-    @Override
-    @Transactional
-    public void createNotification(String username, String type, String content) {
-        Notification notification = Notification.builder()
-                .username(username)
-                .type(NotificationType.valueOf(type))
-                .content(content)
-                .isRead(false)
-                .timestamp(LocalDateTime.now().toString())
-                .build();
 
-        notificationRepository.save(notification);
+    @Transactional
+    public void createPostNotification(String title) {
+        List<Member> members = memberRepository.findAll();
+
+        String content = '"'+title +'"' + "라는 새로운 게시글이 등록되었어요.";
+
+        for(Member member : members) {
+            Notification notification = new Notification().builder()
+                    .username(member.getUsername())
+                    .type(NotificationType.POST_CREATE)
+                    .content(content)
+                    .isRead(false)
+                    .timestamp(LocalDateTime.now().toString())
+                    .build();
+
+            notificationRepository.save(notification);
+        }
     }
 
     @Override
