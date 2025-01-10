@@ -7,8 +7,10 @@ import blaybus.happynewyear.member.dto.MemberInfoDto;
 import blaybus.happynewyear.member.dto.PasswordUpdateDto;
 import blaybus.happynewyear.member.dto.SignUpDto;
 import blaybus.happynewyear.member.entity.Member;
+import blaybus.happynewyear.member.entity.Team;
 import blaybus.happynewyear.member.jwt.JwtTokenProvider;
 import blaybus.happynewyear.member.repository.MemberRepository;
+import blaybus.happynewyear.member.repository.TeamRepository;
 import blaybus.happynewyear.member.service.MemberService;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +33,7 @@ public class MemberServiceImpl implements MemberService {
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final TeamRepository teamRepository;
 
     @Override
     @Transactional
@@ -53,11 +56,13 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     public void signUp(SignUpDto signUpDto) {
         validateDuplicateMember(signUpDto.getUsername());
+        Team team = teamRepository.findByTeamNameAndTeamNumber(signUpDto.getTeamName(), signUpDto.getTeamNumber())
+                .orElseThrow(() -> new BusinessException(ErrorCode.TEAM_NOT_FOUND));
         //password 암호화
         String encodedPassword = passwordEncoder.encode(signUpDto.getPassword());
         List<String> roles = new ArrayList<>();
         roles.add("USER");  //USER 권한 부여
-        memberRepository.save(signUpDto.toEntity(encodedPassword, roles));
+        memberRepository.save(signUpDto.toEntity(encodedPassword, team, roles));
     }
 
     public void validateDuplicateMember(String username) {

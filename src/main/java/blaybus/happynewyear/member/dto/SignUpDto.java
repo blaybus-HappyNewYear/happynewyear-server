@@ -1,6 +1,7 @@
 package blaybus.happynewyear.member.dto;
 
 import blaybus.happynewyear.member.entity.Member;
+import blaybus.happynewyear.member.entity.Team;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -15,24 +16,23 @@ public class SignUpDto {
     private String password;
     private String name;
     private String startDate;
-    private String team;
+    private String teamName;
     private int teamNumber;
     private String jobGroup;
     private String level;
     private int imgNumber;
 
-    public Member toEntity(String encodedPassword, List<String> roles) {
+    public Member toEntity(String encodedPassword, Team team, List<String> roles) {
         return Member.builder()
-                .id(id)
-                .username(username)
+                .id(this.id)
+                .username(this.username)
                 .password(encodedPassword)
-                .name(name)
-                .startDate(startDate)
+                .name(this.name)
+                .startDate(this.startDate)
                 .team(team)
-                .teamNumber(teamNumber)
-                .jobGroup(jobGroup)
-                .level(level)
-                .imgNumber(imgNumber)
+                .jobGroup(this.jobGroup)
+                .level(this.level)
+                .imgNumber(this.imgNumber)
                 .roles(roles)
                 .build();
     }
