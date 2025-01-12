@@ -5,8 +5,10 @@ import blaybus.happynewyear.config.error.exception.BusinessException;
 import blaybus.happynewyear.connector.service.BaseSheetService;
 import blaybus.happynewyear.member.dto.*;
 import blaybus.happynewyear.member.entity.Member;
+import blaybus.happynewyear.member.entity.Team;
 import blaybus.happynewyear.member.jwt.JwtTokenProvider;
 import blaybus.happynewyear.member.repository.MemberRepository;
+import blaybus.happynewyear.member.repository.TeamRepository;
 import blaybus.happynewyear.member.service.MemberService;
 import blaybus.happynewyear.redis.RedisService;
 import io.jsonwebtoken.Claims;
@@ -33,6 +35,7 @@ public class MemberServiceImpl implements MemberService {
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final TeamRepository teamRepository;
     private final RedisService redisService;
 
     private final BaseSheetService baseSheetService;
@@ -63,12 +66,16 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional
     public void signUp(SignUpDto signUpDto) {
+
         validateDuplicateMember(signUpDto.getId(), signUpDto.getUsername());
+        Team team = teamRepository.findByTeamNameAndTeamNumber(signUpDto.getTeamName(), signUpDto.getTeamNumber())
+                .orElseThrow(() -> new BusinessException(ErrorCode.TEAM_NOT_FOUND));
+      
         //password 암호화
         String encodedPassword = passwordEncoder.encode(signUpDto.getPassword());
         List<String> roles = new ArrayList<>();
         roles.add("USER");  //USER 권한 부여
-        memberRepository.save(signUpDto.toEntity(encodedPassword, roles));
+        memberRepository.save(signUpDto.toEntity(encodedPassword, team, roles));
     }
 
     public void validateDuplicateMember(Long id, String username) {

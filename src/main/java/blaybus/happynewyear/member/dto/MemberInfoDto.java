@@ -12,18 +12,18 @@ public class MemberInfoDto {
     private Long id;
     private String name;
     private String level;
-    private int imgNumber;
+    private String imgUrl;
     private String startDate;
-    private String team;
+    private String teamName;
 
     public static MemberInfoDto toDto(Member member) {
         return MemberInfoDto.builder()
                 .id(member.getId())
                 .name(member.getName())
                 .level(member.getLevel())
-                .imgNumber(member.getImgNumber())
+                .imgUrl("/images/character" + member.getImgNumber() + ".png")
                 .startDate(member.getStartDate())
-                .team(member.getTeam())
+                .teamName(member.getTeam().getTeamName())
                 .build();
     }
 }

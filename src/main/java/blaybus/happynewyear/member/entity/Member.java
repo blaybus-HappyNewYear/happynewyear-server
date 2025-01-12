@@ -1,5 +1,6 @@
 package blaybus.happynewyear.member.entity;
 
+import blaybus.happynewyear.exp.entity.Exp;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -25,11 +26,15 @@ public class Member implements UserDetails {
     private String password;
     private String name;
     private String startDate;
-    private String team;
-    private int teamNumber;
     private String jobGroup;
     private String level;
     private int imgNumber;
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Exp> exp;
+
+    @ManyToOne
+    @JoinColumn(name = "team_id", nullable = false) // 외래 키 컬럼 이름 정의
+    private Team team;
 
     @ElementCollection(fetch = FetchType.EAGER)
     List<String> roles = new ArrayList<>();

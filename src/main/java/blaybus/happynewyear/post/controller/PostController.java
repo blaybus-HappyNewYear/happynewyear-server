@@ -24,10 +24,10 @@ public class PostController {
 
     //게시판 조회
     @GetMapping("/board")
-    public ResponseEntity<List<PostPreviewDto>> paging(@PageableDefault(page = 1) Pageable pageable) {
+    public ResponseEntity<PagingDto> paging(@PageableDefault(page = 1) Pageable pageable) {
         Page<PostPreviewDto> postPreviewDtos = postService.paging(pageable);
 
-        /*
+
         int blockLimit = 5;     // 현재 사용자가 선택한 페이지 앞 뒤로 3페이지 씩만 보여줌
         int startPage = (((int) Math.ceil(((double) pageable.getPageNumber() / blockLimit))) - 1) * blockLimit + 1;
         int endPage = Math.min((startPage + blockLimit - 1), postPreviewDtos.getTotalPages());
@@ -37,9 +37,9 @@ public class PostController {
                 .startPage(startPage)
                 .endPage(endPage)
                 .build();
-         */
 
-        return ResponseEntity.ok(postPreviewDtos.getContent());
+        return ResponseEntity.ok(pagingDto);
+        //return ResponseEntity.ok(postPreviewDtos.getContent());
     }
 
     //게시글 작성

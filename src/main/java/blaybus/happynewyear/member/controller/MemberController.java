@@ -8,6 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 public class MemberController {
@@ -58,6 +61,15 @@ public class MemberController {
         String accessToken = jwtTokenProvider.resloveAccessToken(request);
         memberService.updateCharacter(accessToken, imgNumber);
         return ResponseEntity.ok("캐릭터가 성공적으로 변경되었습니다");
+    }
+
+    @GetMapping("/character-list")
+    public ResponseEntity<List<CharacterDto>> getCharacterList() {
+        List<CharacterDto> characterList = new ArrayList<>();
+        for (int i = 1; i <= 8; i++) {
+            characterList.add(CharacterDto.toDto(i));
+        }
+        return ResponseEntity.ok(characterList);
     }
 
     @GetMapping("/jwt-test")
