@@ -4,12 +4,15 @@ import blaybus.happynewyear.member.dto.MemberDeleteDto;
 import blaybus.happynewyear.member.dto.MemberUpdateDto;
 import blaybus.happynewyear.member.dto.SignUpDto;
 import blaybus.happynewyear.member.service.MemberService;
+import blaybus.happynewyear.post.dto.CreatePostDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/member-sheet")
+@RequestMapping("/sheet")
 @RequiredArgsConstructor
 public class MemberSheetController {
 
@@ -37,7 +40,7 @@ public class MemberSheetController {
         memberService.deleteMember(memberDeleteDto.getUsername());
         return ResponseEntity.ok("멤버 삭제 성공");
 
-
     }
+
 
 }
