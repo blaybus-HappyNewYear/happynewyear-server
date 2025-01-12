@@ -68,8 +68,11 @@ public class MemberServiceImpl implements MemberService {
     public void signUp(SignUpDto signUpDto) {
 
         validateDuplicateMember(signUpDto.getId(), signUpDto.getUsername());
+
+
         Team team = teamRepository.findByTeamNameAndTeamNumber(signUpDto.getTeamName(), signUpDto.getTeamNumber())
                 .orElseThrow(() -> new BusinessException(ErrorCode.TEAM_NOT_FOUND));
+
       
         //password 암호화
         String encodedPassword = passwordEncoder.encode(signUpDto.getPassword());
@@ -161,14 +164,21 @@ public class MemberServiceImpl implements MemberService {
 
     /*구글 시트에서 변경사항을 저장하기 위해 필요한 서비스*/
 
+    @Override
+    @Transactional
     public void updateMember(MemberUpdateDto updateDto) {
         Member member = memberRepository.findByUsername(updateDto.getUsername())
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         if (updateDto.getName() != null) member.setName(updateDto.getName());
         if (updateDto.getStartDate() != null) member.setStartDate(updateDto.getStartDate());
-        if (updateDto.getTeam() != null) member.setTeam(updateDto.getTeam());
-        if (updateDto.getTeamNumber() != null) member.setTeamNumber(updateDto.getTeamNumber());
+
+        if (updateDto.getTeam() != null && updateDto.getTeamNumber() != null) {
+            Team team = teamRepository.findByTeamNameAndTeamNumber(updateDto.getTeam(), updateDto.getTeamNumber())
+                    .orElseThrow(() -> new BusinessException(ErrorCode.TEAM_NOT_FOUND));
+            member.setTeam(team);
+        }
+
         if (updateDto.getJobGroup() != null) member.setJobGroup(updateDto.getJobGroup());
         if (updateDto.getLevel() != null) member.setLevel(updateDto.getLevel());
 
@@ -183,13 +193,16 @@ public class MemberServiceImpl implements MemberService {
         memberRepository.save(member);
     }
 
+    @Override
+    @Transactional
     public void deleteMember(String username) {
         Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
         memberRepository.delete(member);
     }
 
-
+    @Override
+    @Transactional
     public boolean memberExists(String username) {
         return memberRepository.existsByUsername(username);
     }

@@ -16,4 +16,6 @@ public class MemberUpdateDto {
     private String level;
     private String password;
     private Integer imgNumber;
+
+
 }

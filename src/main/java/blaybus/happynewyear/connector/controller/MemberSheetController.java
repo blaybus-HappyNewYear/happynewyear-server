@@ -6,11 +6,13 @@ import blaybus.happynewyear.member.dto.SignUpDto;
 import blaybus.happynewyear.member.service.MemberService;
 import blaybus.happynewyear.post.dto.CreatePostDto;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/sheet")
 @RequiredArgsConstructor
@@ -21,6 +23,7 @@ public class MemberSheetController {
     // 추가 처리
     @PostMapping("/add")
     public ResponseEntity<String> addMember(@RequestBody SignUpDto signUpDto) {
+        log.info("team number: {}", signUpDto.getTeamNumber());
         memberService.signUp(signUpDto);
         return ResponseEntity.ok("멤버 추가 성공");
 
