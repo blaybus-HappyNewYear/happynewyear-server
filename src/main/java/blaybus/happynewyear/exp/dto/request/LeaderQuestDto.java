@@ -39,6 +39,7 @@ public class LeaderQuestDto {
                 .cycle(cycle)
                 .monthCalendar(monthCalendar)
                 .achievement(this.achievement)
+                .exp(this.exp)
                 .build();
     }
 
@@ -50,6 +51,7 @@ public class LeaderQuestDto {
                 .monthCalendar(monthCalendar)
                 .weekCalendar(weekCalendar)
                 .achievement(this.achievement)
+                .exp(this.exp)
                 .build();
     }
 

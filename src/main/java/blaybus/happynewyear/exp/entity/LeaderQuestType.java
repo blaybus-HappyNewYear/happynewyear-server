@@ -18,7 +18,5 @@ public class LeaderQuestType {
     private String questName;
     private String cycle;
 
-    @ManyToOne
-    @JoinColumn(name = "team_id")
-    private Team team;
+    private String teamName;
 }

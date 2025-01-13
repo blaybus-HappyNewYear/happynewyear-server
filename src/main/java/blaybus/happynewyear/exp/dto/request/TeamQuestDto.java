@@ -37,6 +37,7 @@ public class TeamQuestDto {
                 .cycle(this.cycle)
                 .monthCalendar(monthCalendar)
                 .achievement(this.achievement)
+                .exp(this.exp)
                 .build();
     }
 
@@ -48,6 +49,7 @@ public class TeamQuestDto {
                 .weekCalendar(weekCalendar)
                 .monthCalendar(monthCalendar)
                 .achievement(this.achievement)
+                .exp(this.exp)
                 .build();
     }
 }
