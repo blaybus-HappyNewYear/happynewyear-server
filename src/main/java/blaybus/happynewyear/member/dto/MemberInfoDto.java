@@ -12,7 +12,7 @@ public class MemberInfoDto {
     private Long id;
     private String name;
     private String level;
-    private String imgUrl;
+    private int imgNumber;
     private String startDate;
     private String teamName;
 
@@ -21,7 +21,7 @@ public class MemberInfoDto {
                 .id(member.getId())
                 .name(member.getName())
                 .level(member.getLevel())
-                .imgUrl("/images/character" + member.getImgNumber() + ".png")
+                .imgNumber(member.getImgNumber())
                 .startDate(member.getStartDate())
                 .teamName(member.getTeam().getTeamName())
                 .build();

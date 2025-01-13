@@ -1,11 +1,14 @@
 package blaybus.happynewyear.member.service.Impl;
 
+import blaybus.happynewyear.calendar.entity.MonthCalendar;
+import blaybus.happynewyear.calendar.entity.WeekCalendar;
+import blaybus.happynewyear.calendar.repository.MonthCalendarRepository;
+import blaybus.happynewyear.calendar.repository.WeekCalendarRepository;
+import blaybus.happynewyear.calendar.service.CalendarService;
 import blaybus.happynewyear.config.error.ErrorCode;
 import blaybus.happynewyear.config.error.exception.BusinessException;
-import blaybus.happynewyear.member.dto.JwtToken;
-import blaybus.happynewyear.member.dto.MemberInfoDto;
-import blaybus.happynewyear.member.dto.PasswordUpdateDto;
-import blaybus.happynewyear.member.dto.SignUpDto;
+import blaybus.happynewyear.connector.service.BaseSheetService;
+import blaybus.happynewyear.member.dto.*;
 import blaybus.happynewyear.member.entity.Member;
 import blaybus.happynewyear.member.entity.Team;
 import blaybus.happynewyear.member.jwt.JwtTokenProvider;
@@ -39,6 +42,11 @@ public class MemberServiceImpl implements MemberService {
     private final PasswordEncoder passwordEncoder;
     private final TeamRepository teamRepository;
     private final RedisService redisService;
+    private final CalendarService calendarService;
+    private final WeekCalendarRepository weekCalendarRepository;
+    private final MonthCalendarRepository monthCalendarRepository;
+
+    private final BaseSheetService baseSheetService;
 
     @Override
     @Transactional
@@ -68,14 +76,20 @@ public class MemberServiceImpl implements MemberService {
     public void signUp(SignUpDto signUpDto) {
 
         validateDuplicateMember(signUpDto.getId(), signUpDto.getUsername());
+
+
         Team team = teamRepository.findByTeamNameAndTeamNumber(signUpDto.getTeamName(), signUpDto.getTeamNumber())
                 .orElseThrow(() -> new BusinessException(ErrorCode.TEAM_NOT_FOUND));
+
       
         //password 암호화
         String encodedPassword = passwordEncoder.encode(signUpDto.getPassword());
         List<String> roles = new ArrayList<>();
         roles.add("USER");  //USER 권한 부여
-        memberRepository.save(signUpDto.toEntity(encodedPassword, team, roles));
+        Member member = memberRepository.save(signUpDto.toEntity(encodedPassword, team, roles));
+
+        // 캘린더 생성
+        createMemberCalendar(member);
     }
 
     public void validateDuplicateMember(Long id, String username) {
@@ -133,6 +147,18 @@ public class MemberServiceImpl implements MemberService {
         String encodedPassword = passwordEncoder.encode(passwordUpdateDto.getNewPassword());
         member.setPassword(encodedPassword);
         memberRepository.save(member);
+
+        // 구글 시트 데이터 반영
+        String sheetName = "참고. 구성원 정보";
+        String idColumn = "H";
+        String passwordColumn = "J";
+        String startRow = "10";
+
+        try {
+            baseSheetService.updatePasswordInSheet(sheetName, idColumn, passwordColumn, startRow, username, passwordUpdateDto.getNewPassword());
+        } catch (Exception e) {
+            throw new RuntimeException("구글 시트 업데이트 중 오류 발생", e);
+        }
     }
 
     @Override
@@ -145,4 +171,61 @@ public class MemberServiceImpl implements MemberService {
         member.setImgNumber(imgNumber);
         memberRepository.save(member);
     }
+
+     private void createMemberCalendar(Member member) {
+        int startYear = 2024;
+        int endYear = 2026;
+        for (int year = startYear; year <= endYear; year++) {
+            List<WeekCalendar> calendarData = calendarService.generateWeeklyCalendar(year, member);
+            List<MonthCalendar> monthCalendars = calendarService.generateMonthlyCalendar(year, member);
+            weekCalendarRepository.saveAll(calendarData);
+            monthCalendarRepository.saveAll(monthCalendars);
+        }
+    }
+
+    /*구글 시트에서 변경사항을 저장하기 위해 필요한 서비스*/
+
+    @Override
+    @Transactional
+    public void updateMember(MemberUpdateDto updateDto) {
+        Member member = memberRepository.findByUsername(updateDto.getUsername())
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        if (updateDto.getName() != null) member.setName(updateDto.getName());
+        if (updateDto.getStartDate() != null) member.setStartDate(updateDto.getStartDate());
+
+        if (updateDto.getTeam() != null && updateDto.getTeamNumber() != null) {
+            Team team = teamRepository.findByTeamNameAndTeamNumber(updateDto.getTeam(), updateDto.getTeamNumber())
+                    .orElseThrow(() -> new BusinessException(ErrorCode.TEAM_NOT_FOUND));
+            member.setTeam(team);
+        }
+
+        if (updateDto.getJobGroup() != null) member.setJobGroup(updateDto.getJobGroup());
+        if (updateDto.getLevel() != null) member.setLevel(updateDto.getLevel());
+
+        // 패스워드 업데이트는 암호화 처리
+        if (updateDto.getPassword() != null) {
+            String encodedPassword = passwordEncoder.encode(updateDto.getPassword());
+            member.setPassword(encodedPassword);
+        }
+
+        if (updateDto.getImgNumber() != null) member.setImgNumber(updateDto.getImgNumber());
+
+        memberRepository.save(member);
+    }
+
+    @Override
+    @Transactional
+    public void deleteMember(String username) {
+        Member member = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        memberRepository.delete(member);
+    }
+
+    @Override
+    @Transactional
+    public boolean memberExists(String username) {
+        return memberRepository.existsByUsername(username);
+    }
+
 }
