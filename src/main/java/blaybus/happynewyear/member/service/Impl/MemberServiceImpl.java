@@ -31,6 +31,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static java.lang.Integer.parseInt;
+import static java.lang.Long.parseLong;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -221,6 +224,54 @@ public class MemberServiceImpl implements MemberService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
         memberRepository.delete(member);
     }
+
+    @Override
+    @Transactional
+    public MemberExpDto getMemberExp(String accessToken){
+        Claims claims = jwtTokenProvider.parseClaims(accessToken);
+        String username = claims.getSubject();
+        Member member = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        // 시트 데이터 검색조건에 유저 id 넣어주기
+        String sheetName = "예시. 경험치 현황";
+        String rangeToWrite = "B11:B11"; // 경험치 현황시트의 사번 정보가 적혀있는 칸
+        List<List<Object>> idData = List.of(List.of(member.getId().toString()));
+        try{
+            baseSheetService.writeSheetData(sheetName, rangeToWrite, idData);
+        }
+        catch (Exception e) {
+            throw new BusinessException(ErrorCode.SHEET_READ_FAILED);
+        }
+
+        // 유저 id로 세팅한 시트 데이터 값을 가져오기
+        String rangeToRead = "C14:F14";
+        try{
+            List<List<Object>> readSheetData = baseSheetService.readSheetData(sheetName, rangeToRead);
+            if (readSheetData == null || readSheetData.isEmpty() || readSheetData.get(0).size() < 4) throw new BusinessException(ErrorCode.SHEET_READ_FAILED);
+            List<Object> rowData = readSheetData.get(0);
+            int accumExp = Integer.parseInt(rowData.get(1).toString());
+            int currExp = Integer.parseInt(rowData.get(2).toString());
+            int necessaryExp = Integer.parseInt(rowData.get(3).toString());
+            int presentPercent = (int) ((double) accumExp / necessaryExp * 100);
+            int currentPercent = currExp >= 9000 ? 100 : (int) ((double) currExp / 9000 * 100);
+
+            return MemberExpDto.builder()
+                    .id(member.getId())
+                    .accumExp(accumExp)
+                    .currExp(currExp)
+                    .necessaryExp(necessaryExp)
+                    .presentPercent(presentPercent)
+                    .currentPercent(currentPercent)
+                    .build();
+
+        } catch (Exception e) {
+            throw new BusinessException(ErrorCode.SHEET_READ_FAILED, "시트 데이터 읽기 실패: " + e.getMessage());
+        }
+
+    }
+
+
 
     @Override
     @Transactional
