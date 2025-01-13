@@ -10,13 +10,15 @@ import java.time.LocalDateTime;
 
 @Getter
 public class LeaderQuestDto {
-    private int monthOrWeek;
+    private int month;
+    private int week;
     private Long memberId;
     private String memberName;
     private String questName;
     private String achievement;
     private int exp;
     private String comments;
+    private String teamName;
 
     public Exp toExp(Member member, LocalDate earnedDate) {
         return Exp.builder()

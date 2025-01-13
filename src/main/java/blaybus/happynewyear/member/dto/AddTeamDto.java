@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 public class AddTeamDto {
     private String teamName;
-    private int teamNumber;
+    private Integer teamNumber;
 
     public Team toEntity() {
         return Team.builder()

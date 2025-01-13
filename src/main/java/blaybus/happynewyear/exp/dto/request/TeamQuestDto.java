@@ -18,7 +18,7 @@ public class TeamQuestDto {
     private String cycle;
     private int monthOrWeek;
     private int exp;
-    private float productivity;
+    private String comments;
 
     public TeamExp toTeamExp(Team team, LocalDate earnedDate) {
         return TeamExp.builder()
@@ -37,6 +37,7 @@ public class TeamQuestDto {
                 .member(member)
                 .exp(this.exp)
                 .earnedDate(earnedDate)
+                .comments(this.comments)
                 .build();
     }
 
