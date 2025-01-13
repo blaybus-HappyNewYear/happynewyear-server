@@ -1,9 +1,7 @@
 package blaybus.happynewyear.member.service;
 
-import blaybus.happynewyear.member.dto.JwtToken;
-import blaybus.happynewyear.member.dto.MemberInfoDto;
-import blaybus.happynewyear.member.dto.PasswordUpdateDto;
-import blaybus.happynewyear.member.dto.SignUpDto;
+import blaybus.happynewyear.member.dto.*;
+import blaybus.happynewyear.member.entity.Member;
 
 public interface MemberService {
 
@@ -13,4 +11,11 @@ public interface MemberService {
     MemberInfoDto getMemberInfo(String accessToken);
     void updatePassword(String accessToken, PasswordUpdateDto passwordUpdateDto);
     void updateCharacter(String accessToken, int imgNumber);
+
+    void updateMember(MemberUpdateDto memberUpdateDto);
+
+    boolean memberExists(String username);
+
+
+    void deleteMember(String username);
 }

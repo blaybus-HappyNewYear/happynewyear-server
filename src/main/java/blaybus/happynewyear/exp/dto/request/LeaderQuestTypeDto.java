@@ -7,6 +7,7 @@ import lombok.Getter;
 public class LeaderQuestTypeDto {
     private String questName;
     private String cycle;
+    private String teamName;
 
     public LeaderQuestType toEntity() {
         return LeaderQuestType.builder()
