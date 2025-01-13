@@ -1,6 +1,6 @@
 package blaybus.happynewyear.member.entity;
 
-import blaybus.happynewyear.exp.entity.TeamExp;
+import blaybus.happynewyear.exp.entity.LeaderQuestType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,6 +24,6 @@ public class Team {
     @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Member> members = new ArrayList<>();
 
-    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<TeamExp> teamExps = new ArrayList<>();
+    @OneToMany(mappedBy = "team")
+    private List<LeaderQuestType> leaderQuestTypes = new ArrayList<>();
 }
