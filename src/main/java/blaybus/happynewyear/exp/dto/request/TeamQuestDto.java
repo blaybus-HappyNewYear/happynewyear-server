@@ -1,5 +1,6 @@
 package blaybus.happynewyear.exp.dto.request;
 
+import blaybus.happynewyear.calendar.entity.Quest;
 import blaybus.happynewyear.exp.entity.Exp;
 import blaybus.happynewyear.exp.entity.TeamExp;
 import blaybus.happynewyear.exp.enums.ExpType;
@@ -38,5 +39,9 @@ public class TeamQuestDto {
                 .earnedDate(earnedDate)
                 .comments(this.comments)
                 .build();
+    }
+
+    public Quest toQuest(Member member, LocalDate earnedDate) {
+        return Quest.builder().build();
     }
 }

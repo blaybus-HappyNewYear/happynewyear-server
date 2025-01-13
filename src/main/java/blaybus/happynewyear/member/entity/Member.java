@@ -1,5 +1,7 @@
 package blaybus.happynewyear.member.entity;
 
+import blaybus.happynewyear.calendar.entity.MonthCalendar;
+import blaybus.happynewyear.calendar.entity.WeekCalendar;
 import blaybus.happynewyear.exp.entity.Exp;
 import jakarta.persistence.*;
 import lombok.*;
@@ -35,6 +37,12 @@ public class Member implements UserDetails {
     @ManyToOne
     @JoinColumn(name = "team_id", nullable = false) // 외래 키 컬럼 이름 정의
     private Team team;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WeekCalendar> weekCalendars = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MonthCalendar> monthCalendars = new ArrayList<>();
 
     @ElementCollection(fetch = FetchType.EAGER)
     List<String> roles = new ArrayList<>();
