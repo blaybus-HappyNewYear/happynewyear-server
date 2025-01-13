@@ -1,16 +1,14 @@
 package blaybus.happynewyear.calendar.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import blaybus.happynewyear.member.entity.Member;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
 @Getter
 @Setter
-public class WeekCalendarEntity {
+public class WeekCalendar {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long Id;
@@ -22,7 +20,11 @@ public class WeekCalendarEntity {
 
     private boolean isFirst;
 
-    private int questCount;
+    private int questCount = 0;
 
     private String achievement = "None"; // MAX, MEDIUM, NONE
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 }

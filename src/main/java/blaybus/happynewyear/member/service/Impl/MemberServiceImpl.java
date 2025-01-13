@@ -1,5 +1,10 @@
 package blaybus.happynewyear.member.service.Impl;
 
+import blaybus.happynewyear.calendar.entity.MonthCalendar;
+import blaybus.happynewyear.calendar.entity.WeekCalendar;
+import blaybus.happynewyear.calendar.repository.MonthCalendarRepository;
+import blaybus.happynewyear.calendar.repository.WeekCalendarRepository;
+import blaybus.happynewyear.calendar.service.CalendarService;
 import blaybus.happynewyear.config.error.ErrorCode;
 import blaybus.happynewyear.config.error.exception.BusinessException;
 import blaybus.happynewyear.member.dto.JwtToken;
@@ -39,6 +44,9 @@ public class MemberServiceImpl implements MemberService {
     private final PasswordEncoder passwordEncoder;
     private final TeamRepository teamRepository;
     private final RedisService redisService;
+    private final CalendarService calendarService;
+    private final WeekCalendarRepository weekCalendarRepository;
+    private final MonthCalendarRepository monthCalendarRepository;
 
     @Override
     @Transactional
@@ -75,7 +83,10 @@ public class MemberServiceImpl implements MemberService {
         String encodedPassword = passwordEncoder.encode(signUpDto.getPassword());
         List<String> roles = new ArrayList<>();
         roles.add("USER");  //USER 권한 부여
-        memberRepository.save(signUpDto.toEntity(encodedPassword, team, roles));
+        Member member = memberRepository.save(signUpDto.toEntity(encodedPassword, team, roles));
+
+        // 캘린더 생성
+        createMemberCalendar(member);
     }
 
     public void validateDuplicateMember(Long id, String username) {
@@ -144,5 +155,16 @@ public class MemberServiceImpl implements MemberService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
         member.setImgNumber(imgNumber);
         memberRepository.save(member);
+    }
+
+     private void createMemberCalendar(Member member) {
+        int startYear = 2024;
+        int endYear = 2026;
+        for (int year = startYear; year <= endYear; year++) {
+            List<WeekCalendar> calendarData = calendarService.generateWeeklyCalendar(year, member);
+            List<MonthCalendar> monthCalendars = calendarService.generateMonthlyCalendar(year, member);
+            weekCalendarRepository.saveAll(calendarData);
+            monthCalendarRepository.saveAll(monthCalendars);
+        }
     }
 }

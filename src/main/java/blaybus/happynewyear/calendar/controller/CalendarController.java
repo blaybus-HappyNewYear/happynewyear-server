@@ -1,17 +1,19 @@
 package blaybus.happynewyear.calendar.controller;
 
-import blaybus.happynewyear.calendar.entity.WeekCalendarEntity;
+import blaybus.happynewyear.calendar.dto.MonthCalendarDto;
+import blaybus.happynewyear.calendar.dto.WeekCalendarDto;
+import blaybus.happynewyear.calendar.entity.MonthCalendar;
+import blaybus.happynewyear.calendar.entity.WeekCalendar;
 import blaybus.happynewyear.calendar.repository.WeekCalendarRepository;
 import blaybus.happynewyear.calendar.service.CalendarService;
+import blaybus.happynewyear.member.jwt.JwtTokenProvider;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -20,10 +22,29 @@ public class CalendarController {
 
     private final CalendarService calendarService;
     private final WeekCalendarRepository weekCalendarRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
+    // weekly 캘린더 목록 가져오기
+    @GetMapping("calendar/weekly")
+    public ResponseEntity<List<WeekCalendarDto>> getWeeklyCalendar(HttpServletRequest request) {
+        String accessToken = jwtTokenProvider.resloveAccessToken(request);
+        List<WeekCalendarDto> weekCalendarDtos = calendarService.getWeeklyCalendars(accessToken);
+        return ResponseEntity.ok(weekCalendarDtos);
+    }
+
+    // monthly 캘린더 목록 가져오기
+    @GetMapping("calendar/monthly")
+    public ResponseEntity<List<MonthCalendarDto>> getMonthlyCalendar(HttpServletRequest request) {
+        String accessToken = jwtTokenProvider.resloveAccessToken(request);
+        List<MonthCalendarDto> monthCalendarDtos = calendarService.getMonthlyCalendars(accessToken);
+        return ResponseEntity.ok(monthCalendarDtos);
+    }
+
+
+    /*
     // 초기 진입: 2025년 1월 첫 페이지 반환
     @GetMapping("/calendar")
-    public ResponseEntity<Map<String, Object>> getDefaultPage(
+    public ResponseEntity<Map<String, Object>> getDefaultPage(HttpServletRequest request,
             @RequestParam(defaultValue = "15") int size) {
         int defaultYear = 2025;
         int defaultPage = 0; // 첫 페이지
@@ -46,13 +67,17 @@ public class CalendarController {
         return ResponseEntity.ok(calendarService.getNextPage(year, page, size));
     }
 
+     */
+
+    /*
     //캘린더 생성
     @GetMapping("/week-calendar")
     public ResponseEntity<String> getWeekCalendars(@RequestParam int startYear, @RequestParam int endYear) {
         for (int year = startYear; year <= endYear; year++) {
-            List<WeekCalendarEntity> calendarData = calendarService.generateCalendar(year);
+            List<WeekCalendarEntity> calendarData = calendarService.generateWeeklyCalendar(year);
             weekCalendarRepository.saveAll(calendarData);
         }
         return ResponseEntity.ok("주간 달력이 저장되었습니다");
     }
+     */
 }
