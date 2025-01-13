@@ -13,6 +13,7 @@ public enum ErrorCode {
     DUPLICATED_USERNAME(HttpStatus.CONFLICT, "E409001", "이미 사용중인 사용자 이름입니다."),
     DUPLICATED_ID(HttpStatus.CONFLICT, "E409002", "이미 존재하는 사번입니다."),
     DUPLICATED_TEAM(HttpStatus.CONFLICT, "E409003", "이미 존재하는 팀입니다"),
+    DUPLICATED_QUEST(HttpStatus.CONFLICT, "E409004", "이미 존재하는 퀘스트 타입입니다."),
 
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "E404001", "존재하지 않는 아이디입니다."),
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "E404002", "존재하지 않는 게시글입니다."),

@@ -24,6 +24,4 @@ public class Team {
     @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Member> members = new ArrayList<>();
 
-    @OneToMany(mappedBy = "team")
-    private List<LeaderQuestType> leaderQuestTypes = new ArrayList<>();
 }

@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -45,11 +46,14 @@ public class ExpRequestServiceImpl implements ExpRequestService {
     @Override
     @Transactional
     public void addLeaderQuestType(LeaderQuestTypeDto leaderQuestTypeDto) {
-        List<Team> teams = teamRepository.findByTeamName(leaderQuestTypeDto.getTeamName());
-        for (Team team : teams) {
-            log.info("team: {}, {}", team.getTeamName(), team.getTeamNumber());
-            LeaderQuestType save = leaderQuestTypeRepository.save(leaderQuestTypeDto.toEntity(team));
-            log.info("leaderQuestType: {}", save.getQuestName());
+        validateDuplicateType(leaderQuestTypeDto.getQuestName());
+        LeaderQuestType save = leaderQuestTypeRepository.save(leaderQuestTypeDto.toEntity());
+    }
+
+    private void validateDuplicateType(String questName) {
+        Optional<LeaderQuestType> findType = leaderQuestTypeRepository.findByQuestName(questName);
+        if(findType.isPresent()) {
+            throw new BusinessException(ErrorCode.DUPLICATED_QUEST);
         }
     }
 
@@ -69,6 +73,7 @@ public class ExpRequestServiceImpl implements ExpRequestService {
         expRepository.save(leaderQuestDto.toExp(member, now));
         // quest 저장
         String cycle = leaderQuestType.getCycle();
+        // 퀘스트가 주간 퀘스트인 경우 (월간과 주간 캘린더에 전부 추가)
         if (cycle.equals("주")) {
             WeekCalendar weekCalendar = weekCalendarRepository
                     .findByMemberAndYearAndWeekNumber(member, 2025, leaderQuestDto.getWeek())
@@ -76,11 +81,37 @@ public class ExpRequestServiceImpl implements ExpRequestService {
             MonthCalendar monthCalendar = monthCalendarRepository
                     .findByMemberAndYearAndMonth(member, 2025, weekCalendar.getMonth())
                     .orElseThrow(() -> new BusinessException(ErrorCode.CALENDAR_NOT_FOUND));
+
+            //캘린더 achievement 변경
+            String thisAchievement = leaderQuestDto.getAchievement();
+            if (thisAchievement.equals("Max")) {
+                weekCalendar.setAchievement("Max");
+                monthCalendar.setAchievement("Max");
+            } else if (thisAchievement.equals("Medium")) {
+                if (weekCalendar.getAchievement().equals("None")) {
+                    weekCalendar.setAchievement("Medium");
+                }
+                if (monthCalendar.getAchievement().equals("None")) {
+                    monthCalendar.setAchievement("Medium");
+                }
+            }
             questRepository.save(leaderQuestDto.toQuest(cycle, monthCalendar, weekCalendar));
+            // 퀘스트가 월간 퀘스트인 경우 (월간 캘린더에만 추가)
         } else if (cycle.equals("월")) {
             MonthCalendar monthCalendar = monthCalendarRepository
                     .findByMemberAndYearAndMonth(member, 2025, leaderQuestDto.getMonth())
                     .orElseThrow(() -> new BusinessException(ErrorCode.CALENDAR_NOT_FOUND));
+
+            //캘린더 achievement 변경
+            String thisAchievement = leaderQuestDto.getAchievement();
+            if (thisAchievement.equals("Max")) {
+                monthCalendar.setAchievement("Max");
+            } else if (thisAchievement.equals("Medium")) {
+                if (monthCalendar.getAchievement().equals("None")) {
+                    monthCalendar.setAchievement("Medium");
+                }
+            }
+
             questRepository.save(leaderQuestDto.toQuest(cycle, monthCalendar));
         }
 
@@ -104,6 +135,7 @@ public class ExpRequestServiceImpl implements ExpRequestService {
 
         //팀에 해당하는 멤버에게 해당 quest를 저장함
         for (Member member : members) {
+            // 퀘스트가 주간 퀘스트인 경우 (월간과 주간 캘린더에 전부 추가)
             if (teamQuestDto.getCycle().equals("주")) {
                 WeekCalendar weekCalendar = weekCalendarRepository
                         .findByMemberAndYearAndWeekNumber(member, 2025, teamQuestDto.getMonthOrWeek())
@@ -111,12 +143,38 @@ public class ExpRequestServiceImpl implements ExpRequestService {
                 MonthCalendar monthCalendar = monthCalendarRepository
                         .findByMemberAndYearAndMonth(member, 2025, weekCalendar.getMonth())
                         .orElseThrow(() -> new BusinessException(ErrorCode.CALENDAR_NOT_FOUND));
-                questRepository.save(teamQuestDto.toQuest(weekCalendar, monthCalendar));
 
+                //캘린더 achievement 변경
+                String thisAchievement = teamQuestDto.getAchievement();
+                if (thisAchievement.equals("Max")) {
+                    weekCalendar.setAchievement("Max");
+                    monthCalendar.setAchievement("Max");
+                } else if (thisAchievement.equals("Medium")) {
+                    if (weekCalendar.getAchievement().equals("None")) {
+                        weekCalendar.setAchievement("Medium");
+                    }
+                    if (monthCalendar.getAchievement().equals("None")) {
+                        monthCalendar.setAchievement("Medium");
+                    }
+                }
+
+                questRepository.save(teamQuestDto.toQuest(weekCalendar, monthCalendar));
+                // 퀘스트가 월간 퀘스트인 경우 (월간 캘린더에만 추가)
             } else if (teamQuestDto.getCycle().equals("월")) {
                 MonthCalendar monthCalendar = monthCalendarRepository
                         .findByMemberAndYearAndMonth(member, 2025, teamQuestDto.getMonthOrWeek())
                         .orElseThrow(() -> new BusinessException(ErrorCode.CALENDAR_NOT_FOUND));
+
+                //캘린더 achievement 변경
+                String thisAchievement = teamQuestDto.getAchievement();
+                if (thisAchievement.equals("Max")) {
+                    monthCalendar.setAchievement("Max");
+                } else if (thisAchievement.equals("Medium")) {
+                    if (monthCalendar.getAchievement().equals("None")) {
+                        monthCalendar.setAchievement("Medium");
+                    }
+                }
+
                 questRepository.save(teamQuestDto.toQuest(monthCalendar));
             }
         }

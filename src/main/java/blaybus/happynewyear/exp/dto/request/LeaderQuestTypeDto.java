@@ -10,11 +10,11 @@ public class LeaderQuestTypeDto {
     private String cycle;
     private String teamName;
 
-    public LeaderQuestType toEntity(Team team) {
+    public LeaderQuestType toEntity() {
         return LeaderQuestType.builder()
                 .questName(questName)
                 .cycle(cycle)
-                .team(team)
+                .teamName(teamName)
                 .build();
     }
 }
