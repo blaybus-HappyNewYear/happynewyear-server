@@ -1,9 +1,8 @@
 package blaybus.happynewyear.calendar.controller;
 
+import blaybus.happynewyear.calendar.dto.CalendarTeamDto;
 import blaybus.happynewyear.calendar.dto.MonthCalendarDto;
 import blaybus.happynewyear.calendar.dto.WeekCalendarDto;
-import blaybus.happynewyear.calendar.entity.MonthCalendar;
-import blaybus.happynewyear.calendar.entity.WeekCalendar;
 import blaybus.happynewyear.calendar.repository.WeekCalendarRepository;
 import blaybus.happynewyear.calendar.service.CalendarService;
 import blaybus.happynewyear.member.jwt.JwtTokenProvider;
@@ -38,6 +37,22 @@ public class CalendarController {
         String accessToken = jwtTokenProvider.resloveAccessToken(request);
         List<MonthCalendarDto> monthCalendarDtos = calendarService.getMonthlyCalendars(accessToken);
         return ResponseEntity.ok(monthCalendarDtos);
+    }
+
+    // 소속 가져오기
+    @GetMapping("/calendar/team")
+    public ResponseEntity<CalendarTeamDto> getCalendarTeam(HttpServletRequest request) {
+        String accessToken = jwtTokenProvider.resloveAccessToken(request);
+        CalendarTeamDto calendarTeam = calendarService.getCalendarTeam(accessToken);
+        return ResponseEntity.ok(calendarTeam);
+    }
+
+    // 리더 부여 퀘스트 목록
+    @GetMapping("calendar/quest-type")
+    public ResponseEntity<List<String>> getQuestType(HttpServletRequest request) {
+        String accessToken = jwtTokenProvider.resloveAccessToken(request);
+        List<String> questTypes = calendarService.getQuestType(accessToken);
+        return ResponseEntity.ok(questTypes);
     }
 
 
