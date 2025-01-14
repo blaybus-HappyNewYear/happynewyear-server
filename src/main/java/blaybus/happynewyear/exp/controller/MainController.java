@@ -34,6 +34,8 @@ public class MainController {
         return ResponseEntity.ok(recentExpDtos);
     }
 
+
+
     // 사용자가 올해 획득한 경험치
     @PostMapping("/main/all-exp")
     public ResponseEntity<Map<String, Object>> getAllExp(HttpServletRequest request, @PageableDefault(page = 1) Pageable pageable) {
@@ -48,6 +50,8 @@ public class MainController {
 
         return ResponseEntity.ok(response);
     }
+
+    // 사용자가 올해 획득한 경험치 양
 
     // 사용자 캐릭터
     @GetMapping("/main/character")

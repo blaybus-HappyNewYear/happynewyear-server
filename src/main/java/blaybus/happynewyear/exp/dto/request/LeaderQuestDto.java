@@ -18,7 +18,6 @@ public class LeaderQuestDto {
     private String achievement;
     private int exp;
     private String comments;
-    private String teamName;
 
     public Exp toExp(Member member, LocalDate earnedDate) {
         return Exp.builder()

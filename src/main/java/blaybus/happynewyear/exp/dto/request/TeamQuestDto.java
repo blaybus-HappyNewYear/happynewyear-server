@@ -19,6 +19,7 @@ public class TeamQuestDto {
     private int monthOrWeek;
     private int exp;
     private String comments;
+    private String achievement;
 
     public TeamExp toTeamExp(Team team, LocalDate earnedDate) {
         return TeamExp.builder()
