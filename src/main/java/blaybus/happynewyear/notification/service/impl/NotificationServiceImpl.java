@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -81,6 +82,74 @@ public List<NotificationDto> getNotifications(HttpServletRequest request) {
 
             notificationRepository.save(notification);
         }
+    }
+
+    @Transactional
+    public void createLeaderNotification(Long memberId, String questName,int exp){
+    Member member = memberRepository.findById(memberId)
+            .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        String content = "\"리더부여 퀘스트 " + questName + "\"를 완료하셨습니다. 경험치 " + exp + " do를 획득하셨습니다.";
+        Notification notification = new Notification().builder()
+                .username(member.getUsername())
+                .type(NotificationType.EXP_GAIN)
+                .content(content)
+                .isRead(false)
+                .timestamp(LocalDateTime.now().toString())
+                .build();
+
+        notificationRepository.save(notification);
+
+    }
+
+    @Transactional
+    public void createTeamNotification(Long memberId, String comments,int exp){
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        String content = "\"직무별 퀘스트에서 생산성 " + comments + "\"를 달성하셨습니다. 경험치 " + exp + " do를 획득하셨습니다.";
+        Notification notification = new Notification().builder()
+                .username(member.getUsername())
+                .type(NotificationType.EXP_GAIN)
+                .content(content)
+                .isRead(false)
+                .timestamp(LocalDateTime.now().toString())
+                .build();
+
+        notificationRepository.save(notification);
+
+    }
+
+    @Transactional
+    public void createTfProjectNotification(Long memberId, String questName,int exp){
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        String content = "\"전사프로젝트 " + questName + "\"를 완료하셨습니다. 경험치 " + exp + " do를 획득하셨습니다.";
+        Notification notification = new Notification().builder()
+                .username(member.getUsername())
+                .type(NotificationType.EXP_GAIN)
+                .content(content)
+                .isRead(false)
+                .timestamp(LocalDateTime.now().toString())
+                .build();
+
+        notificationRepository.save(notification);
+
+    }
+
+    @Transactional
+    public void createPerfEvalNotification(Long memberId, String grade,int exp){
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        String content = "\"인사평가 등급 " + grade + "\"입니다. 경험치 " + exp + " do를 획득하셨습니다.";
+        Notification notification = new Notification().builder()
+                .username(member.getUsername())
+                .type(NotificationType.EXP_GAIN)
+                .content(content)
+                .isRead(false)
+                .timestamp(LocalDateTime.now().toString())
+                .build();
+
+        notificationRepository.save(notification);
+
     }
 
     @Override
