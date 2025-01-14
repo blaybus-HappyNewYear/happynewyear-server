@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface WeekCalendarRepository extends JpaRepository<WeekCalendar, Long> {
 
@@ -15,4 +16,5 @@ public interface WeekCalendarRepository extends JpaRepository<WeekCalendar, Long
     long countByYear(int year);
 
     List<WeekCalendar> findByMemberId(Long memberId);
+    Optional<WeekCalendar> findByMemberAndYearAndWeekNumber(Member member, int year, int weekNumber);
 }

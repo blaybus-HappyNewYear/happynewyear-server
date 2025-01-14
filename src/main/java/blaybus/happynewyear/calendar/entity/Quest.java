@@ -1,9 +1,6 @@
 package blaybus.happynewyear.calendar.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,5 +14,20 @@ import lombok.NoArgsConstructor;
 public class Quest {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
+
+    private String questName;
+    private String comments;
+    private String achievement;
+    private int exp;
+
+    private String cycle;
+
+    @ManyToOne
+    @JoinColumn(name = "week_calendar_id")
+    private WeekCalendar weekCalendar;
+
+    @ManyToOne
+    @JoinColumn(name = "month_calendar_id")
+    private MonthCalendar monthCalendar;
 }

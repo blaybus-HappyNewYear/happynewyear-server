@@ -21,11 +21,14 @@ public class MonthCalendarDto {
     private List<QuestDto> questList;
 
     public static MonthCalendarDto toDto(MonthCalendar monthCalendar) {
+        List<QuestDto> questList = monthCalendar.getQuests().stream().map(QuestDto::toDto).toList();
         return MonthCalendarDto.builder()
                 .id(monthCalendar.getId())
                 .year(monthCalendar.getYear())
                 .month(monthCalendar.getMonth())
                 .achievement(monthCalendar.getAchievement())
+                .questList(questList)
+                .questCount(questList.size())
                 .build();
     }
 }

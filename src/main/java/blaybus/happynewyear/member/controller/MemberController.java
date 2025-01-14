@@ -72,6 +72,14 @@ public class MemberController {
         return ResponseEntity.ok(characterList);
     }
 
+    @GetMapping("/get-exp")
+    public ResponseEntity<MemberExpDto> getExp(HttpServletRequest request) {
+        String accessToken = jwtTokenProvider.resloveAccessToken(request);
+        MemberExpDto memberExpDto = memberService.getMemberExp(accessToken);
+        return ResponseEntity.ok(memberExpDto); // 여기에 MemberExoDto를 반환해 줘야함.
+    }
+
+
     @GetMapping("/jwt-test")
     public String test() {
         return "success!";}

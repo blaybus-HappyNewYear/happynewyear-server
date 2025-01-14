@@ -16,6 +16,8 @@ public interface MemberService {
 
     boolean memberExists(String username);
 
+    MemberExpDto getMemberExp(String accessToken);
+
 
     void deleteMember(String username);
 }

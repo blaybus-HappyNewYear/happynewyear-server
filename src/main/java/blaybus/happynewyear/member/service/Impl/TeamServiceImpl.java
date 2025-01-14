@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class TeamServiceImpl implements TeamService {
@@ -19,7 +21,15 @@ public class TeamServiceImpl implements TeamService {
     @Override
     @Transactional
     public void addTeam(AddTeamDto addTeamDto) {
+        validateDuplicateTeam(addTeamDto.getTeamName(), addTeamDto.getTeamNumber());
         teamRepository.save(addTeamDto.toEntity());
+    }
+
+    private void validateDuplicateTeam(String teamName, int teamNumber) {
+        Optional<Team> findTeam = teamRepository.findByTeamNameAndTeamNumber(teamName, teamNumber);
+        if(findTeam.isPresent()) {
+            throw new BusinessException(ErrorCode.DUPLICATED_TEAM);
+        }
     }
 
     @Override
