@@ -84,40 +84,41 @@ public class MainServiceImpl implements MainService {
 
     @Override
     @Transactional
-    public CurrExpDto getCurrExp(String accessToken){
+    public CurrExpDto getCurrExp(String accessToken) {
         Claims claims = jwtTokenProvider.parseClaims(accessToken);
         String username = claims.getSubject();
         Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        // 시트 데이터 검색조건에 유저 id 넣어주기
         String sheetName = "예시. 경험치 현황";
-        String rangeToWrite = "B11:B11"; // 경험치 현황시트의 사번 정보가 적혀있는 칸
-        List<List<Object>> idData = List.of(List.of(member.getId().toString()));
-        try{
+        String rangeToWrite = "B11:B11";
+        List<List<Object>> idData = List.of(List.of(member.getId()));
+        try {
             baseSheetService.writeSheetData(sheetName, rangeToWrite, idData);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new BusinessException(ErrorCode.SHEET_READ_FAILED);
         }
 
-        // 유저 id로 세팅한 시트 데이터 값을 가져오기
         String rangeToRead = "C14:F14";
-        try{
+        try {
             List<List<Object>> readSheetData = baseSheetService.readSheetData(sheetName, rangeToRead);
-            if (readSheetData == null || readSheetData.isEmpty() || readSheetData.get(0).size() < 4) throw new BusinessException(ErrorCode.SHEET_READ_FAILED);
+            if (readSheetData == null || readSheetData.isEmpty() || readSheetData.get(0).size() < 4) {
+                throw new BusinessException(ErrorCode.SHEET_READ_FAILED);
+            }
             List<Object> rowData = readSheetData.get(0);
-            int currExp = Integer.parseInt(rowData.get(2).toString());
+
+            String rawValue = rowData.get(2).toString(); // 3번째 값 가져오기
+            String cleanedValue = rawValue.replace(",", "");
+            int currExp = Integer.parseInt(cleanedValue);
 
             return CurrExpDto.builder()
                     .currExp(currExp)
                     .build();
-
         } catch (Exception e) {
             throw new BusinessException(ErrorCode.SHEET_READ_FAILED, "시트 데이터 읽기 실패: " + e.getMessage());
         }
-
     }
+
 
 
 }

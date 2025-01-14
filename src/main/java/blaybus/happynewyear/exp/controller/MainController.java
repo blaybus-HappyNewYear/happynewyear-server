@@ -54,7 +54,7 @@ public class MainController {
     }
 
     // 사용자가 올해 획득한 경험치 양
-    @GetMapping("/main/character")
+    @GetMapping("/main/curr-exp")
     public ResponseEntity<CurrExpDto> getCurrExp(HttpServletRequest request) {
         String accessToken = jwtTokenProvider.resloveAccessToken(request);
         CurrExpDto currExpDto = mainService.getCurrExp(accessToken);

@@ -236,7 +236,7 @@ public class MemberServiceImpl implements MemberService {
         // 시트 데이터 검색조건에 유저 id 넣어주기
         String sheetName = "예시. 경험치 현황";
         String rangeToWrite = "B11:B11"; // 경험치 현황시트의 사번 정보가 적혀있는 칸
-        List<List<Object>> idData = List.of(List.of(member.getId().toString()));
+        List<List<Object>> idData = List.of(List.of(member.getId()));
         try{
             baseSheetService.writeSheetData(sheetName, rangeToWrite, idData);
         }
@@ -250,9 +250,9 @@ public class MemberServiceImpl implements MemberService {
             List<List<Object>> readSheetData = baseSheetService.readSheetData(sheetName, rangeToRead);
             if (readSheetData == null || readSheetData.isEmpty() || readSheetData.get(0).size() < 4) throw new BusinessException(ErrorCode.SHEET_READ_FAILED);
             List<Object> rowData = readSheetData.get(0);
-            int accumExp = Integer.parseInt(rowData.get(1).toString());
-            int currExp = Integer.parseInt(rowData.get(2).toString());
-            int necessaryExp = Integer.parseInt(rowData.get(3).toString());
+            int accumExp = Integer.parseInt(rowData.get(1).toString().replace(",",""));
+            int currExp = Integer.parseInt(rowData.get(2).toString().replace(",",""));
+            int necessaryExp = Integer.parseInt(rowData.get(3).toString().replace(",",""));
             int presentPercent = (int) ((double) accumExp / necessaryExp * 100);
             int currentPercent = currExp >= 9000 ? 100 : (int) ((double) currExp / 9000 * 100);
 
@@ -260,6 +260,7 @@ public class MemberServiceImpl implements MemberService {
                     .id(member.getId())
                     .accumExp(accumExp)
                     .currExp(currExp)
+                    .currlimit(9000)
                     .necessaryExp(necessaryExp)
                     .presentPercent(presentPercent)
                     .currentPercent(currentPercent)
