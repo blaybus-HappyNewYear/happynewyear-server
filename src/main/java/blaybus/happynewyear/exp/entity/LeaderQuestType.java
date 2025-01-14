@@ -1,9 +1,7 @@
 package blaybus.happynewyear.exp.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import blaybus.happynewyear.member.entity.Team;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,4 +17,6 @@ public class LeaderQuestType {
     private Long id;
     private String questName;
     private String cycle;
+
+    private String teamName;
 }

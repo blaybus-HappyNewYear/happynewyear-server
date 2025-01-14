@@ -1,14 +1,10 @@
 package blaybus.happynewyear.exp.dto.reponse;
 
 import blaybus.happynewyear.exp.entity.Exp;
-import blaybus.happynewyear.exp.entity.TeamExp;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Builder
 @Getter

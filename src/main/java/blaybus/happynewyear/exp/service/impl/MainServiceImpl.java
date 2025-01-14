@@ -5,9 +5,7 @@ import blaybus.happynewyear.config.error.exception.BusinessException;
 import blaybus.happynewyear.exp.dto.reponse.AllExpDto;
 import blaybus.happynewyear.exp.dto.reponse.RecentExpDto;
 import blaybus.happynewyear.exp.entity.Exp;
-import blaybus.happynewyear.exp.entity.TeamExp;
 import blaybus.happynewyear.exp.repository.ExpRepository;
-import blaybus.happynewyear.exp.repository.TeamExpRepository;
 import blaybus.happynewyear.exp.service.MainService;
 import blaybus.happynewyear.member.dto.CharacterDto;
 import blaybus.happynewyear.member.entity.Member;
@@ -23,10 +21,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 @Service
