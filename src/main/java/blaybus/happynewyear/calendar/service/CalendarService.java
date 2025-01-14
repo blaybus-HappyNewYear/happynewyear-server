@@ -1,5 +1,6 @@
 package blaybus.happynewyear.calendar.service;
 
+import blaybus.happynewyear.calendar.dto.CalendarTeamDto;
 import blaybus.happynewyear.calendar.dto.MonthCalendarDto;
 import blaybus.happynewyear.calendar.dto.WeekCalendarDto;
 import blaybus.happynewyear.calendar.entity.MonthCalendar;
@@ -23,5 +24,7 @@ public interface CalendarService {
     List<WeekCalendar> generateWeeklyCalendar(int year, Member member);
 
     List<MonthCalendar> generateMonthlyCalendar(int year, Member member);
+    CalendarTeamDto getCalendarTeam(String accessToken);
+    List<String> getQuestType(String accessToken);
 
 }
