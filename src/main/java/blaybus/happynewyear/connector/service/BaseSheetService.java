@@ -53,9 +53,10 @@ public class BaseSheetService {
 
         sheetsService.spreadsheets().values()
                 .update(spreadsheetId, fullRange, body)
-                .setValueInputOption("RAW")
+                .setValueInputOption("USER_ENTERED")
                 .execute();
     }
+
 
     public void updatePasswordInSheet(String sheetName, String idColumn, String passwordColumn, String startRow, String memberId, String newPassword) throws Exception {
         Sheets sheetsService = getSheetsService();

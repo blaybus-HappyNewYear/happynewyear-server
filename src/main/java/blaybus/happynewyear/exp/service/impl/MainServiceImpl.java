@@ -2,12 +2,15 @@ package blaybus.happynewyear.exp.service.impl;
 
 import blaybus.happynewyear.config.error.ErrorCode;
 import blaybus.happynewyear.config.error.exception.BusinessException;
+import blaybus.happynewyear.connector.service.BaseSheetService;
 import blaybus.happynewyear.exp.dto.reponse.AllExpDto;
+import blaybus.happynewyear.exp.dto.reponse.CurrExpDto;
 import blaybus.happynewyear.exp.dto.reponse.RecentExpDto;
 import blaybus.happynewyear.exp.entity.Exp;
 import blaybus.happynewyear.exp.repository.ExpRepository;
 import blaybus.happynewyear.exp.service.MainService;
 import blaybus.happynewyear.member.dto.CharacterDto;
+import blaybus.happynewyear.member.dto.MemberExpDto;
 import blaybus.happynewyear.member.entity.Member;
 import blaybus.happynewyear.member.jwt.JwtTokenProvider;
 import blaybus.happynewyear.member.repository.MemberRepository;
@@ -31,6 +34,7 @@ public class MainServiceImpl implements MainService {
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
     private final ExpRepository expRepository;
+    private final BaseSheetService baseSheetService;
 
     @Override
     @Transactional
@@ -77,4 +81,44 @@ public class MainServiceImpl implements MainService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
         return CharacterDto.toDto(member.getImgNumber());
     }
+
+    @Override
+    @Transactional
+    public CurrExpDto getCurrExp(String accessToken) {
+        Claims claims = jwtTokenProvider.parseClaims(accessToken);
+        String username = claims.getSubject();
+        Member member = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        String sheetName = "예시. 경험치 현황";
+        String rangeToWrite = "B11:B11";
+        List<List<Object>> idData = List.of(List.of(member.getId()));
+        try {
+            baseSheetService.writeSheetData(sheetName, rangeToWrite, idData);
+        } catch (Exception e) {
+            throw new BusinessException(ErrorCode.SHEET_READ_FAILED);
+        }
+
+        String rangeToRead = "C14:F14";
+        try {
+            List<List<Object>> readSheetData = baseSheetService.readSheetData(sheetName, rangeToRead);
+            if (readSheetData == null || readSheetData.isEmpty() || readSheetData.get(0).size() < 4) {
+                throw new BusinessException(ErrorCode.SHEET_READ_FAILED);
+            }
+            List<Object> rowData = readSheetData.get(0);
+
+            String rawValue = rowData.get(2).toString(); // 3번째 값 가져오기
+            String cleanedValue = rawValue.replace(",", "");
+            int currExp = Integer.parseInt(cleanedValue);
+
+            return CurrExpDto.builder()
+                    .currExp(currExp)
+                    .build();
+        } catch (Exception e) {
+            throw new BusinessException(ErrorCode.SHEET_READ_FAILED, "시트 데이터 읽기 실패: " + e.getMessage());
+        }
+    }
+
+
+
 }
