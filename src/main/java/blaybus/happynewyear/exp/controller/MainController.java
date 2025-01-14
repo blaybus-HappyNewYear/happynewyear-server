@@ -1,6 +1,7 @@
 package blaybus.happynewyear.exp.controller;
 
 import blaybus.happynewyear.exp.dto.reponse.AllExpDto;
+import blaybus.happynewyear.exp.dto.reponse.CurrExpDto;
 import blaybus.happynewyear.exp.dto.reponse.RecentExpDto;
 import blaybus.happynewyear.exp.service.MainService;
 import blaybus.happynewyear.member.dto.CharacterDto;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,6 +36,8 @@ public class MainController {
         return ResponseEntity.ok(recentExpDtos);
     }
 
+
+
     // 사용자가 올해 획득한 경험치
     @PostMapping("/main/all-exp")
     public ResponseEntity<Map<String, Object>> getAllExp(HttpServletRequest request, @PageableDefault(page = 1) Pageable pageable) {
@@ -49,6 +53,14 @@ public class MainController {
         return ResponseEntity.ok(response);
     }
 
+    // 사용자가 올해 획득한 경험치 양
+    @GetMapping("/main/curr-exp")
+    public ResponseEntity<CurrExpDto> getCurrExp(HttpServletRequest request) {
+        String accessToken = jwtTokenProvider.resloveAccessToken(request);
+        CurrExpDto currExpDto = mainService.getCurrExp(accessToken);
+        return ResponseEntity.ok(currExpDto);
+    }
+
     // 사용자 캐릭터
     @GetMapping("/main/character")
     public ResponseEntity<CharacterDto> getCharcter(HttpServletRequest request) {
@@ -56,4 +68,5 @@ public class MainController {
         CharacterDto characterDto = mainService.getCharacter(accessToken);
         return ResponseEntity.ok(characterDto);
     }
+
 }

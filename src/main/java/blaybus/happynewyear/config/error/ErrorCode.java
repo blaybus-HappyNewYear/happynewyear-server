@@ -24,7 +24,13 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"E500001","서버 처리 중 오류가 발생했습니다. 관리자에게 문의하세요."),
     NO_NOTIFICATION(HttpStatus.NOT_FOUND,"E404005","사용자 알림이 존재하지 않습니다."),
     NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND,"E404006","요청한 알림이 존재하지 않습니다."),
-    INVALID_READ_STATE(HttpStatus.BAD_REQUEST, "E400001","이미 읽은 알람입니다.");
+    INVALID_READ_STATE(HttpStatus.BAD_REQUEST, "E400001","이미 읽은 알람입니다."),
+
+    SHEET_UPDATE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "E500002", "Google Sheet 데이터를 업데이트하는 데 실패했습니다."),
+    SHEET_READ_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "E500003", "Google Sheet 데이터를 읽어오는 데 실패했습니다."),
+    SHEET_DATA_NOT_FOUND(HttpStatus.NOT_FOUND, "E404007", "Google Sheet에서 요청한 데이터를 찾을 수 없습니다.");
+
+
   
     private final String message;
     private final String code;

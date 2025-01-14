@@ -1,6 +1,7 @@
 package blaybus.happynewyear.exp.service;
 
 import blaybus.happynewyear.exp.dto.reponse.AllExpDto;
+import blaybus.happynewyear.exp.dto.reponse.CurrExpDto;
 import blaybus.happynewyear.exp.dto.reponse.RecentExpDto;
 import blaybus.happynewyear.member.dto.CharacterDto;
 import org.springframework.data.domain.Page;
@@ -12,5 +13,6 @@ public interface MainService {
     List<RecentExpDto> getRecentExp(String accessToken);
     Page<AllExpDto> getAllExp(String accessToken, Pageable pageable);
     CharacterDto getCharacter(String accessToken);
+    CurrExpDto getCurrExp(String accessToken);
 
 }
