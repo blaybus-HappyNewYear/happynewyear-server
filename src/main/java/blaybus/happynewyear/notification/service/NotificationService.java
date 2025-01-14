@@ -13,7 +13,10 @@ public interface NotificationService {
     // 알림 생성
     // void createExpGainNotification(String username, int ext); // 경험치 기능 구현 이후 마저 구현
     void createPostNotification(String title);
-
+    void createLeaderNotification(Long memberId, String questName,int exp);
+    void createTeamNotification(Long memberId, String comments,int exp);
+    void createTfProjectNotification(Long memberId, String questName,int exp);
+    void createPerfEvalNotification(Long memberId, String grade, int exp);
     // 알림 읽음 상태 업데이트
     void updateRead(Long notificationId, Boolean isRead);
 }

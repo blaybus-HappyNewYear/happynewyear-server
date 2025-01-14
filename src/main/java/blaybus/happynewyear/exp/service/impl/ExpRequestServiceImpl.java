@@ -21,6 +21,7 @@ import blaybus.happynewyear.member.entity.Member;
 import blaybus.happynewyear.member.entity.Team;
 import blaybus.happynewyear.member.repository.MemberRepository;
 import blaybus.happynewyear.member.repository.TeamRepository;
+import blaybus.happynewyear.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -42,12 +43,14 @@ public class ExpRequestServiceImpl implements ExpRequestService {
     private final WeekCalendarRepository weekCalendarRepository;
     private final MonthCalendarRepository monthCalendarRepository;
     private final QuestRepository questRepository;
+    private final NotificationService notificationService;
 
     @Override
     @Transactional
     public void addLeaderQuestType(LeaderQuestTypeDto leaderQuestTypeDto) {
         validateDuplicateType(leaderQuestTypeDto.getQuestName());
         LeaderQuestType save = leaderQuestTypeRepository.save(leaderQuestTypeDto.toEntity());
+
     }
 
     private void validateDuplicateType(String questName) {
@@ -113,6 +116,7 @@ public class ExpRequestServiceImpl implements ExpRequestService {
             }
 
             questRepository.save(leaderQuestDto.toQuest(cycle, monthCalendar));
+            notificationService.createLeaderNotification(member.getId(), leaderQuestDto.getQuestName(), leaderQuestDto.getExp());
         }
 
     }
@@ -176,6 +180,7 @@ public class ExpRequestServiceImpl implements ExpRequestService {
                 }
 
                 questRepository.save(teamQuestDto.toQuest(monthCalendar));
+                notificationService.createTeamNotification(member.getId(), teamQuestDto.getComments(), teamQuestDto.getExp());
             }
         }
     }
@@ -187,6 +192,7 @@ public class ExpRequestServiceImpl implements ExpRequestService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
         LocalDate now = LocalDate.now();
         expRepository.save(tfProjectDto.toEntity(member, now));
+        notificationService.createTfProjectNotification(member.getId(), tfProjectDto.getProjectName(), tfProjectDto.getExp());
     }
 
     @Override
@@ -196,5 +202,6 @@ public class ExpRequestServiceImpl implements ExpRequestService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
         LocalDate now = LocalDate.now();
         expRepository.save(perfEvalDto.toEntity(member, now));
+        notificationService.createPerfEvalNotification(member.getId(), perfEvalDto.getGrade(), perfEvalDto.getExp());
     }
 }
