@@ -1,8 +1,6 @@
 package blaybus.happynewyear.calendar.service.Impl;
 
-import blaybus.happynewyear.calendar.dto.MonthCalendarDto;
-import blaybus.happynewyear.calendar.dto.QuestDto;
-import blaybus.happynewyear.calendar.dto.WeekCalendarDto;
+import blaybus.happynewyear.calendar.dto.*;
 import blaybus.happynewyear.calendar.entity.MonthCalendar;
 import blaybus.happynewyear.calendar.entity.Quest;
 import blaybus.happynewyear.calendar.entity.WeekCalendar;
@@ -12,9 +10,12 @@ import blaybus.happynewyear.calendar.repository.WeekCalendarRepository;
 import blaybus.happynewyear.calendar.service.CalendarService;
 import blaybus.happynewyear.config.error.ErrorCode;
 import blaybus.happynewyear.config.error.exception.BusinessException;
+import blaybus.happynewyear.exp.entity.LeaderQuestType;
+import blaybus.happynewyear.exp.repository.LeaderQuestTypeRepository;
 import blaybus.happynewyear.member.entity.Member;
 import blaybus.happynewyear.member.jwt.JwtTokenProvider;
 import blaybus.happynewyear.member.repository.MemberRepository;
+import blaybus.happynewyear.member.repository.TeamRepository;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -39,6 +40,7 @@ public class CalendarServiceImpl implements CalendarService {
     private final MonthCalendarRepository monthCalendarRepository;
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final LeaderQuestTypeRepository leaderQuestTypeRepository;
 
     @Override
     @Transactional
@@ -123,6 +125,27 @@ public class CalendarServiceImpl implements CalendarService {
             monthCalendarData.add(monthCalendar);
         }
         return monthCalendarData;
+    }
+
+    @Override
+    public CalendarTeamDto getCalendarTeam(String accessToken) {
+        String username = jwtTokenProvider.parseClaims(accessToken).getSubject();
+        Member member = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        return CalendarTeamDto.toDto(member.getTeam());
+    }
+
+    @Override
+    public List<String> getQuestType(String accessToken) {
+        String username = jwtTokenProvider.parseClaims(accessToken).getSubject();
+        Member member = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        List<String> questTypeList = new ArrayList<>();
+        List<LeaderQuestType> leaderQuestTypes = leaderQuestTypeRepository.findByTeamName(member.getTeam().getTeamName());
+        for (LeaderQuestType leaderQuestType : leaderQuestTypes) {
+            questTypeList.add(leaderQuestType.getQuestName());
+        }
+        return questTypeList;
     }
 
     /*
