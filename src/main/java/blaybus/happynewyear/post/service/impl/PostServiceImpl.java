@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -54,8 +55,14 @@ public class PostServiceImpl implements PostService {
 
         //한 페이지 당 10개씩 글을 보여주고 정렬 기준은 ID 기준으로 내림차순
         Page<Post> postsPage = postRepository.findAll(PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "id")));
-        Page<PostPreviewDto> PostPreviewDtos = postsPage.map(PostPreviewDto::toDto);
 
-        return PostPreviewDtos;
+        return postsPage.map(PostPreviewDto::toDto);
+    }
+
+    @Override
+    @Transactional
+    public List<PostPreviewDto> searchPost(String keyword) {
+        return postRepository.findByTitleContainingOrContentContaining(keyword, keyword).stream()
+                .map(PostPreviewDto::toDto).toList();
     }
 }

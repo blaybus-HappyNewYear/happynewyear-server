@@ -13,4 +13,6 @@ public interface PostService {
     ReadPostDto readPost(Long id);
 
     Page<PostPreviewDto> paging(Pageable pageable);
+
+    List<PostPreviewDto> searchPost(String keyword);
 }
