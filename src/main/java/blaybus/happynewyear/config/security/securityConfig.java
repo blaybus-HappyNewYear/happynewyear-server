@@ -34,6 +34,7 @@ public class securityConfig {
                         .requestMatchers("/mypage/**").hasRole("USER")
                         .requestMatchers("/sign-out").hasRole("USER")
                         .requestMatchers("/jwt-test").hasRole("USER")
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().permitAll())
                 .addFilterBefore(new JwtVerificationFilter(jwtTokenProvider, redisService),
                         UsernamePasswordAuthenticationFilter.class)
