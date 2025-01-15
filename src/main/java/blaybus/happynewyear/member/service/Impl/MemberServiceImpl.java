@@ -272,6 +272,15 @@ public class MemberServiceImpl implements MemberService {
 
     }
 
+    // FCM 토큰 업데이트 메서드
+    @Transactional
+    public void updateFcmToken(String username, String fcmToken) {
+        Member member = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        member.setFcmToken(fcmToken); // FCM 토큰 설정
+        memberRepository.save(member);
+    }
 
 
     @Override
@@ -279,5 +288,7 @@ public class MemberServiceImpl implements MemberService {
     public boolean memberExists(String username) {
         return memberRepository.existsByUsername(username);
     }
+
+
 
 }

@@ -27,6 +27,7 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 src/main/resources/key.json
+src/main/resources/notification_key.json
 
 ### NetBeans ###
 /nbproject/private/

@@ -84,4 +84,12 @@ public class MemberController {
     public String test() {
         return "success!";}
 
+    @PostMapping("/fcm-token")
+    public ResponseEntity<String> updateFcmToken(HttpServletRequest request,
+                                                 @RequestParam String fcmToken) {
+        String username = jwtTokenProvider.resloveAccessToken(request);
+        memberService.updateFcmToken(username, fcmToken);
+        return ResponseEntity.ok("FCM 토큰이 성공적으로 업데이트되었습니다.");
+    }
+
 }
