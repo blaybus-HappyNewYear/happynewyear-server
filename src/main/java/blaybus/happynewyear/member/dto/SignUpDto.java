@@ -20,7 +20,6 @@ public class SignUpDto {
     private int teamNumber;
     private String jobGroup;
     private String level;
-    private int imgNumber;
 
     public Member toEntity(String encodedPassword, Team team, List<String> roles) {
         return Member.builder()
@@ -32,7 +31,7 @@ public class SignUpDto {
                 .team(team)
                 .jobGroup(this.jobGroup)
                 .level(this.level)
-                .imgNumber(this.imgNumber)
+                .imgNumber(1)
                 .roles(roles)
                 .build();
     }

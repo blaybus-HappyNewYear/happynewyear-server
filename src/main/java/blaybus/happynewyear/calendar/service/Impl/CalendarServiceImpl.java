@@ -128,6 +128,7 @@ public class CalendarServiceImpl implements CalendarService {
     }
 
     @Override
+    @Transactional
     public CalendarTeamDto getCalendarTeam(String accessToken) {
         String username = jwtTokenProvider.parseClaims(accessToken).getSubject();
         Member member = memberRepository.findByUsername(username)
@@ -136,6 +137,7 @@ public class CalendarServiceImpl implements CalendarService {
     }
 
     @Override
+    @Transactional
     public List<String> getQuestType(String accessToken) {
         String username = jwtTokenProvider.parseClaims(accessToken).getSubject();
         Member member = memberRepository.findByUsername(username)

@@ -7,13 +7,11 @@ import java.time.LocalDate;
 
 @Getter
 public class CreatePostDto {
-    private Long id;
     private String title;
     private String content;
 
     public Post toEntity(LocalDate createdAt) {
         return Post.builder()
-                .id(id)
                 .title(title)
                 .author("관리자")
                 .createdAt(createdAt)
