@@ -55,4 +55,11 @@ public class PostController {
         ReadPostDto readPostDto = postService.readPost(id);
         return ResponseEntity.ok(readPostDto);
     }
+
+    //게시글 검색
+    @GetMapping("/board/search")
+    public ResponseEntity<List<PostPreviewDto>> searchPost(@RequestParam String keyword) {
+        List<PostPreviewDto> postPreviewDtos = postService.searchPost(keyword);
+        return ResponseEntity.ok(postPreviewDtos);
+    }
 }
