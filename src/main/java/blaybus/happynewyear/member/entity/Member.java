@@ -31,6 +31,10 @@ public class Member implements UserDetails {
     private String jobGroup;
     private String level;
     private int imgNumber;
+
+    @Column(nullable = true) // FCM 토큰 필드 추가
+    private String fcmToken;
+
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Exp> exp;
 

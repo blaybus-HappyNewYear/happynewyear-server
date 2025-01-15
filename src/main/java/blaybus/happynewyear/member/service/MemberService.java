@@ -20,4 +20,5 @@ public interface MemberService {
 
 
     void deleteMember(String username);
+    void updateFcmToken(String username, String fcmToken);
 }
