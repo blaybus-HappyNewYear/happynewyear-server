@@ -135,6 +135,7 @@ public class ExpRequestServiceImpl implements ExpRequestService {
 
         for (Member member : members) {
             expRepository.save(teamQuestDto.toExp(member, now));
+            notificationService.createTeamNotification(member.getId(), teamQuestDto.getComments(), teamQuestDto.getExp());
         }
 
         //팀에 해당하는 멤버에게 해당 quest를 저장함
@@ -180,7 +181,6 @@ public class ExpRequestServiceImpl implements ExpRequestService {
                 }
 
                 questRepository.save(teamQuestDto.toQuest(monthCalendar));
-                notificationService.createTeamNotification(member.getId(), teamQuestDto.getComments(), teamQuestDto.getExp());
             }
         }
     }
