@@ -9,6 +9,7 @@ import blaybus.happynewyear.notification.dto.NotificationDto;
 import blaybus.happynewyear.notification.entity.Notification;
 import blaybus.happynewyear.notification.entity.NotificationType;
 import blaybus.happynewyear.notification.repository.NotificationRepository;
+import blaybus.happynewyear.notification.service.FCMService;
 import blaybus.happynewyear.notification.service.NotificationService;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,6 +33,7 @@ public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
+    private final FCMService fcmService;
 
 public List<NotificationDto> getNotifications(HttpServletRequest request) {
     // 1. Access Token 추출
@@ -81,6 +83,9 @@ public List<NotificationDto> getNotifications(HttpServletRequest request) {
                     .build();
 
             notificationRepository.save(notification);
+            if (member.getFcmToken() != null) {
+                fcmService.sendNotification(member.getFcmToken(), "게시글", content);
+            }
         }
     }
 
@@ -96,6 +101,9 @@ public List<NotificationDto> getNotifications(HttpServletRequest request) {
                 .isRead(false)
                 .timestamp(LocalDateTime.now().toString())
                 .build();
+        if (member.getFcmToken() != null) {
+            fcmService.sendNotification(member.getFcmToken(), "경험치", content);
+        }
 
         notificationRepository.save(notification);
 
@@ -114,6 +122,10 @@ public List<NotificationDto> getNotifications(HttpServletRequest request) {
                 .timestamp(LocalDateTime.now().toString())
                 .build();
 
+        if (member.getFcmToken() != null) {
+            fcmService.sendNotification(member.getFcmToken(), "경험치", content);
+        }
+
         notificationRepository.save(notification);
 
     }
@@ -131,6 +143,9 @@ public List<NotificationDto> getNotifications(HttpServletRequest request) {
                 .timestamp(LocalDateTime.now().toString())
                 .build();
 
+        if (member.getFcmToken() != null) {
+            fcmService.sendNotification(member.getFcmToken(), "경험치", content);
+        }
         notificationRepository.save(notification);
 
     }
@@ -148,6 +163,9 @@ public List<NotificationDto> getNotifications(HttpServletRequest request) {
                 .timestamp(LocalDateTime.now().toString())
                 .build();
 
+        if (member.getFcmToken() != null) {
+            fcmService.sendNotification(member.getFcmToken(), "경험치", content);
+        }
         notificationRepository.save(notification);
 
     }
