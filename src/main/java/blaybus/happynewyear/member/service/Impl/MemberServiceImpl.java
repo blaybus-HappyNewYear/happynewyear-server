@@ -274,11 +274,13 @@ public class MemberServiceImpl implements MemberService {
 
     // FCM 토큰 업데이트 메서드
     @Transactional
-    public void updateFcmToken(String username, String fcmToken) {
+    public void updateFcmToken(String accessToken, String fcmToken) {
+        Claims claims = jwtTokenProvider.parseClaims(accessToken);
+        String username = claims.getSubject();
         Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-
         member.setFcmToken(fcmToken); // FCM 토큰 설정
+        log.info("FCMToken: {}", fcmToken);
         memberRepository.save(member);
     }
 

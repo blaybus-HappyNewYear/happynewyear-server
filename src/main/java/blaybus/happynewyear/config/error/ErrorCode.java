@@ -28,8 +28,8 @@ public enum ErrorCode {
 
     SHEET_UPDATE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "E500002", "Google Sheet 데이터를 업데이트하는 데 실패했습니다."),
     SHEET_READ_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "E500003", "Google Sheet 데이터를 읽어오는 데 실패했습니다."),
-    SHEET_DATA_NOT_FOUND(HttpStatus.NOT_FOUND, "E404007", "Google Sheet에서 요청한 데이터를 찾을 수 없습니다.");
-
+    SHEET_DATA_NOT_FOUND(HttpStatus.NOT_FOUND, "E404007", "Google Sheet에서 요청한 데이터를 찾을 수 없습니다."),
+    ACCESS_TOKEN_GENERATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR,"E500004","FCM Access Token 생성 중 오류 발생 ");
 
   
     private final String message;
