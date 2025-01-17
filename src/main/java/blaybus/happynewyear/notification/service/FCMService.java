@@ -1,7 +1,11 @@
 package blaybus.happynewyear.notification.service;
 
+import blaybus.happynewyear.config.error.ErrorCode;
+import blaybus.happynewyear.config.error.exception.BusinessException;
 import com.google.auth.oauth2.GoogleCredentials;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -9,7 +13,10 @@ import org.springframework.web.client.RestTemplate;
 import java.io.InputStream;
 import java.util.Collections;
 
+import static blaybus.happynewyear.config.error.ErrorCode.ACCESS_TOKEN_GENERATION_FAILED;
+
 @Service
+@Slf4j
 public class FCMService {
 
     @Value("${fcm.api-url}")
@@ -22,9 +29,11 @@ public class FCMService {
     private String getAccessToken() {
         try {
             // credentials-file 경로에서 서비스 계정 키 파일 로드
+            log.info("키 파일 로드");
             InputStream serviceAccountStream =
                     getClass().getClassLoader().getResourceAsStream(credentialsFile);
 
+            log.info(serviceAccountStream.toString());
             if (serviceAccountStream == null) {
                 throw new IllegalArgumentException("서비스 계정 키 파일을 찾을 수 없습니다: " + credentialsFile);
             }
@@ -34,15 +43,18 @@ public class FCMService {
                     .createScoped(Collections.singletonList("https://www.googleapis.com/auth/firebase.messaging"));
             googleCredentials.refreshIfExpired();
 
+            log.info("어디가 문제냐 .. ");
             return googleCredentials.getAccessToken().getTokenValue();
         } catch (Exception e) {
-            throw new RuntimeException("Access Token 생성 중 오류 발생", e);
+            // 비즈니스 예외로 변경
+            throw new BusinessException(ErrorCode.ACCESS_TOKEN_GENERATION_FAILED);
         }
     }
 
     // FCM 알림 전송 메서드
     public void sendNotification(String fcmToken, String title, String body) {
         try {
+            log.info(fcmToken);
             String accessToken = getAccessToken();
 
             RestTemplate restTemplate = new RestTemplate();
