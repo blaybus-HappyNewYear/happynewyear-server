@@ -5,6 +5,7 @@ import blaybus.happynewyear.member.jwt.JwtTokenProvider;
 import blaybus.happynewyear.member.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class MemberController {
 
     private final MemberService memberService;
@@ -89,6 +91,7 @@ public class MemberController {
                                                  @RequestBody FcmTokenRequest fcmTokenRequest) {
         String accessToken = jwtTokenProvider.resloveAccessToken(request);
         memberService.updateFcmToken(accessToken, fcmTokenRequest.getFcmToken());
+
         return ResponseEntity.ok("FCM 토큰이 성공적으로 업데이트되었습니다.");
     }
 

@@ -2,6 +2,7 @@ package blaybus.happynewyear.notification.service;
 
 import blaybus.happynewyear.config.error.ErrorCode;
 import blaybus.happynewyear.config.error.exception.BusinessException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auth.oauth2.GoogleCredentials;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,6 +13,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.InputStream;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import static blaybus.happynewyear.config.error.ErrorCode.ACCESS_TOKEN_GENERATION_FAILED;
 
@@ -59,23 +62,29 @@ public class FCMService {
 
             RestTemplate restTemplate = new RestTemplate();
 
+            // 헤더 설정
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(accessToken); // OAuth 2.0 액세스 토큰 설정
             headers.setContentType(MediaType.APPLICATION_JSON);
 
-            // 메시지 요청 JSON 구성
-            String message = "{"
-                    + "\"message\":{"
-                    + "\"token\":\"" + fcmToken + "\","
-                    + "\"notification\":{"
-                    + "\"title\":\"" + title + "\","
-                    + "\"body\":\"" + body + "\""
-                    + "}"
-                    + "}"
-                    + "}";
+            // 메시지 요청 JSON 생성
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            Map<String, Object> notification = new HashMap<>();
+            notification.put("title", title);
+            notification.put("body", body);
+
+            Map<String, Object> message = new HashMap<>();
+            message.put("token", fcmToken);
+            message.put("notification", notification);
+
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("message", message);
+
+            String messageJson = objectMapper.writeValueAsString(requestBody);
 
             // 요청 생성 및 전송
-            HttpEntity<String> request = new HttpEntity<>(message, headers);
+            HttpEntity<String> request = new HttpEntity<>(messageJson, headers);
             ResponseEntity<String> response = restTemplate.exchange(
                     fcmApiUrl,
                     HttpMethod.POST,
@@ -83,9 +92,9 @@ public class FCMService {
                     String.class
             );
 
-            System.out.println("FCM Response: " + response.getBody());
+            log.info("FCM Response: {}", response.getBody());
         } catch (Exception e) {
-            System.err.println("알림 전송 중 오류 발생: " + e.getMessage());
+            log.error("알림 전송 중 오류 발생: ", e);
         }
     }
 }
